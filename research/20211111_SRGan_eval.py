@@ -1,26 +1,44 @@
+#%%
+import os
 import torch
-from models.utils import convert_image, AverageMeter, SRDataset
+
+from utils import convert_image, AverageMeter, create_data_lists
+from datasets import SRDataset
 from skimage.metrics import peak_signal_noise_ratio, structural_similarity
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+data_folder = "../data"
+train_folders = os.path.join(data_folder, "SR_training_datasets/BSDS200")
+test_folders = os.path.join(data_folder, "SR_testing_datasets/BSDS100")
+
+create_data_lists([train_folders], [test_folders], min_size=100, output_folder=data_folder)
+
+#%%
+
+
+
 # Data
-data_folder = "./"
+data_folder = "../data/"
 test_data_names = ["Set5", "Set14", "BSDS100"]
+test_data_names = ["BSDS100"]
 
 # Model checkpoints
-srgan_checkpoint = "./checkpoint_srgan.pth.tar"
-srresnet_checkpoint = "./checkpoint_srresnet.pth.tar"
+srgan_checkpoint = "../weights/checkpoint_srgan.pth.tar"
+srresnet_checkpoint = "../weights/checkpoint_srresnet.pth.tar"
 
 # Load model, either the SRResNet or the SRGAN
 # srresnet = torch.load(srresnet_checkpoint)['model'].to(device)
 # srresnet.eval()
 # model = srresnet
-srgan_generator = torch.load(srgan_checkpoint)['generator'].to(device)
+#%%
+srgan_generator = torch.load(srgan_checkpoint, map_location=device)['generator'].to(device)
 srgan_generator.eval()
 model = srgan_generator
 
+#%%
 # Evaluate
+
 for test_data_name in test_data_names:
     print("\nFor %s:\n" % test_data_name)
 
@@ -66,3 +84,4 @@ for test_data_name in test_data_names:
     print('SSIM - {ssims.avg:.3f}'.format(ssims=SSIMs))
 
 print("\n")
+# %%

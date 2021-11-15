@@ -332,3 +332,4 @@ class TruncatedVGG19(nn.Module):
         output = self.truncated_vgg19(input)  # (N, feature_map_channels, feature_map_w, feature_map_h)
 
         return output
+# %%
