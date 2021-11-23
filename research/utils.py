@@ -17,8 +17,20 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 rgb_weights = torch.FloatTensor([65.481, 128.553, 24.966]).to(device)
 imagenet_mean = torch.FloatTensor([0.485, 0.456, 0.406]).unsqueeze(1).unsqueeze(2)
 imagenet_std = torch.FloatTensor([0.229, 0.224, 0.225]).unsqueeze(1).unsqueeze(2)
-imagenet_mean_cuda = torch.FloatTensor([0.485, 0.456, 0.406]).to(device).unsqueeze(0).unsqueeze(2).unsqueeze(3)
-imagenet_std_cuda = torch.FloatTensor([0.229, 0.224, 0.225]).to(device).unsqueeze(0).unsqueeze(2).unsqueeze(3)
+imagenet_mean_cuda = (
+    torch.FloatTensor([0.485, 0.456, 0.406])
+    .to(device)
+    .unsqueeze(0)
+    .unsqueeze(2)
+    .unsqueeze(3)
+)
+imagenet_std_cuda = (
+    torch.FloatTensor([0.229, 0.224, 0.225])
+    .to(device)
+    .unsqueeze(0)
+    .unsqueeze(2)
+    .unsqueeze(3)
+)
 
 
 def create_data_lists(train_folders, test_folders, min_size, output_folder):
@@ -36,11 +48,11 @@ def create_data_lists(train_folders, test_folders, min_size, output_folder):
         print(d)
         for i in os.listdir(d):
             img_path = os.path.join(d, i)
-            img = Image.open(img_path, mode='r')
+            img = Image.open(img_path, mode="r")
             if img.width >= min_size and img.height >= min_size:
                 train_images.append(img_path)
     print("There are %d images in the training data.\n" % len(train_images))
-    with open(os.path.join(output_folder, 'train_images.json'), 'w') as j:
+    with open(os.path.join(output_folder, "train_images.json"), "w") as j:
         json.dump(train_images, j)
 
     for d in test_folders:
@@ -48,14 +60,21 @@ def create_data_lists(train_folders, test_folders, min_size, output_folder):
         test_name = d.split("/")[-1]
         for i in os.listdir(d):
             img_path = os.path.join(d, i)
-            img = Image.open(img_path, mode='r')
+            img = Image.open(img_path, mode="r")
             if img.width >= min_size and img.height >= min_size:
                 test_images.append(img_path)
-        print("There are %d images in the %s test data.\n" % (len(test_images), test_name))
-        with open(os.path.join(output_folder, test_name + '_test_images.json'), 'w') as j:
+        print(
+            "There are %d images in the %s test data.\n" % (len(test_images), test_name)
+        )
+        with open(
+            os.path.join(output_folder, test_name + "_test_images.json"), "w"
+        ) as j:
             json.dump(test_images, j)
 
-    print("JSONS containing lists of Train and Test images have been saved to %s\n" % output_folder)
+    print(
+        "JSONS containing lists of Train and Test images have been saved to %s\n"
+        % output_folder
+    )
 
 
 def convert_image(img, source, target):
@@ -68,44 +87,58 @@ def convert_image(img, source, target):
                    'y-channel' (luminance channel Y in the YCbCr color format, used to calculate PSNR and SSIM)
     :return: converted image
     """
-    assert source in {'pil', '[0, 1]', '[-1, 1]'}, "Cannot convert from source format %s!" % source
-    assert target in {'pil', '[0, 255]', '[0, 1]', '[-1, 1]', 'imagenet-norm',
-                      'y-channel'}, "Cannot convert to target format %s!" % target
+    assert source in {"pil", "[0, 1]", "[-1, 1]"}, (
+        "Cannot convert from source format %s!" % source
+    )
+    assert target in {
+        "pil",
+        "[0, 255]",
+        "[0, 1]",
+        "[-1, 1]",
+        "imagenet-norm",
+        "y-channel",
+    }, (
+        "Cannot convert to target format %s!" % target
+    )
 
     # Convert from source to [0, 1]
-    if source == 'pil':
+    if source == "pil":
         img = FT.to_tensor(img)
 
-    elif source == '[0, 1]':
+    elif source == "[0, 1]":
         pass  # already in [0, 1]
 
-    elif source == '[-1, 1]':
-        img = (img + 1.) / 2.
+    elif source == "[-1, 1]":
+        img = (img + 1.0) / 2.0
 
     # Convert from [0, 1] to target
-    if target == 'pil':
+    if target == "pil":
         img = FT.to_pil_image(img)
 
-    elif target == '[0, 255]':
-        img = 255. * img
+    elif target == "[0, 255]":
+        img = 255.0 * img
 
-    elif target == '[0, 1]':
+    elif target == "[0, 1]":
         pass  # already in [0, 1]
 
-    elif target == '[-1, 1]':
-        img = 2. * img - 1.
+    elif target == "[-1, 1]":
+        img = 2.0 * img - 1.0
 
-    elif target == 'imagenet-norm':
+    elif target == "imagenet-norm":
         if img.ndimension() == 3:
             img = (img - imagenet_mean) / imagenet_std
         elif img.ndimension() == 4:
             img = (img - imagenet_mean_cuda) / imagenet_std_cuda
 
-    elif target == 'y-channel':
+    elif target == "y-channel":
         # Based on definitions at https://github.com/xinntao/BasicSR/wiki/Color-conversion-in-SR
         # torch.dot() does not work the same way as numpy.dot()
         # So, use torch.matmul() to find the dot product between the last dimension of an 4-D tensor and a 1-D tensor
-        img = torch.matmul(255. * img.permute(0, 2, 3, 1)[:, 4:-4, 4:-4, :], rgb_weights) / 255. + 16.
+        img = (
+            torch.matmul(255.0 * img.permute(0, 2, 3, 1)[:, 4:-4, 4:-4, :], rgb_weights)
+            / 255.0
+            + 16.0
+        )
 
     return img
 
@@ -129,7 +162,7 @@ class ImageTransforms(object):
         self.lr_img_type = lr_img_type
         self.hr_img_type = hr_img_type
 
-        assert self.split in {'train', 'test'}
+        assert self.split in {"train", "test"}
 
     def __call__(self, img):
         """
@@ -138,7 +171,7 @@ class ImageTransforms(object):
         """
 
         # Crop
-        if self.split == 'train':
+        if self.split == "train":
             # Take a random fixed-size crop of the image, which will serve as the high-resolution (HR) image
             left = random.randint(1, img.width - self.crop_size)
             top = random.randint(1, img.height - self.crop_size)
@@ -156,15 +189,23 @@ class ImageTransforms(object):
             hr_img = img.crop((left, top, right, bottom))
 
         # Downsize this crop to obtain a low-resolution version of it
-        lr_img = hr_img.resize((int(hr_img.width / self.scaling_factor), int(hr_img.height / self.scaling_factor)),
-                               Image.BICUBIC)
+        lr_img = hr_img.resize(
+            (
+                int(hr_img.width / self.scaling_factor),
+                int(hr_img.height / self.scaling_factor),
+            ),
+            Image.BICUBIC,
+        )
 
         # Sanity check
-        assert hr_img.width == lr_img.width * self.scaling_factor and hr_img.height == lr_img.height * self.scaling_factor
+        assert (
+            hr_img.width == lr_img.width * self.scaling_factor
+            and hr_img.height == lr_img.height * self.scaling_factor
+        )
 
         # Convert the LR and HR image to the required type
-        lr_img = convert_image(lr_img, source='pil', target=self.lr_img_type)
-        hr_img = convert_image(hr_img, source='pil', target=self.hr_img_type)
+        lr_img = convert_image(lr_img, source="pil", target=self.lr_img_type)
+        hr_img = convert_image(hr_img, source="pil", target=self.hr_img_type)
 
         return lr_img, hr_img
 
@@ -197,7 +238,7 @@ def clip_gradient(optimizer, grad_clip):
     :param grad_clip: clip value
     """
     for group in optimizer.param_groups:
-        for param in group['params']:
+        for param in group["params"]:
             if param.grad is not None:
                 param.grad.data.clamp_(-grad_clip, grad_clip)
 
@@ -220,5 +261,5 @@ def adjust_learning_rate(optimizer, shrink_factor):
 
     print("\nDECAYING learning rate.")
     for param_group in optimizer.param_groups:
-        param_group['lr'] = param_group['lr'] * shrink_factor
-    print("The new learning rate is %f\n" % (optimizer.param_groups[0]['lr'],))
+        param_group["lr"] = param_group["lr"] * shrink_factor
+    print("The new learning rate is %f\n" % (optimizer.param_groups[0]["lr"],))
