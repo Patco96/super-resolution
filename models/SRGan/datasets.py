@@ -1,8 +1,7 @@
 import os
 import json
-import torch
 from PIL import Image
-from utils import ImageTransforms
+from models.SRGan.utils import ImageTransforms
 from torch.utils.data import Dataset
 
 

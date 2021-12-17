@@ -2,8 +2,8 @@
 import os
 import torch
 
-from utils import convert_image, AverageMeter, create_data_lists
-from datasets import SRDataset
+from models.SRGan.utils import convert_image, AverageMeter, create_data_lists
+from models.SRGan.datasets import SRDataset
 from skimage.metrics import peak_signal_noise_ratio, structural_similarity
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -101,4 +101,90 @@ for test_data_name in test_data_names:
     print("SSIM - {ssims.avg:.3f}".format(ssims=SSIMs))
 
 print("\n")
+# %%
+import matplotlib.pyplot as plt
+
+imagenet_mean = torch.FloatTensor([0.485, 0.456, 0.406]).unsqueeze(1).unsqueeze(2)
+imagenet_std = torch.FloatTensor([0.229, 0.224, 0.225]).unsqueeze(1).unsqueeze(2)
+
+for lr_img, sr_img, hr_img in zip(lr_imgs, sr_imgs, hr_imgs):
+    lr_img = (lr_img*imagenet_std.to(device)) + imagenet_mean.to(device)
+    lr_img = lr_img.squeeze(0).cpu().numpy()
+    sr_img = sr_img.squeeze(0).cpu().numpy()
+    hr_img = hr_img.squeeze(0).cpu().numpy()
+    sr_img = convert_image(sr_img.reshape(sr_img.shape[1], sr_img.shape[2], sr_img.shape[0]), source="[-1, 1]", target="pil")
+    hr_img = convert_image(hr_img, source="[-1, 1]", target="pil")
+    fig, ax = plt.subplots(1, 3, figsize=(30, 10))
+    ax[0].imshow(lr_img.reshape(lr_img.shape[1], lr_img.shape[2], lr_img.shape[0]), cmap="gray")
+    ax[0].set_title("LR")
+    ax[1].imshow(sr_img.reshape(sr_img.shape[1], sr_img.shape[2], sr_img.shape[0]), cmap="gray")
+    ax[1].set_title("SR")
+    ax[2].imshow(hr_img.reshape(hr_img.shape[1], hr_img.shape[2], hr_img.shape[0]), cmap="gray")    
+    ax[2].set_title("HR")
+
+# %%
+import numpy as np
+from PIL import Image
+from matplotlib import cm
+
+name = []
+for image, img_name in zip([lr_img, sr_img, hr_img], ["LR", "SR", "HR"]):
+    img = image.reshape(image.shape[1], image.shape[2], image.shape[0])*255
+    pil_img = Image.fromarray(np.uint8(img))
+    pil_img.save(f"{img_name}.png")
+# %%
+pil_img
+# %%
+image = hr_img
+img = image.reshape(image.shape[1], image.shape[2], image.shape[0])*255
+Image.fromarray(np.uint8(img))
+
+# .save("LR.png")
+# %%
+
+from utils import convert_image
+imagenet_mean = torch.FloatTensor([0.485, 0.456, 0.406]).unsqueeze(1).unsqueeze(2)
+imagenet_std = torch.FloatTensor([0.229, 0.224, 0.225]).unsqueeze(1).unsqueeze(2)
+
+for test_data_name in test_data_names:
+    print("\nFor %s:\n" % test_data_name)
+
+    # Custom dataloader
+    test_dataset = SRDataset(
+        data_folder,
+        split="test",
+        crop_size=0,
+        scaling_factor=4,
+        lr_img_type="imagenet-norm",
+        hr_img_type="[-1, 1]",
+        test_data_name=test_data_name,
+    )
+    test_loader = torch.utils.data.DataLoader(
+        test_dataset, batch_size=1, shuffle=False, num_workers=0, pin_memory=True
+    )
+
+    # Prohibit gradient computation explicitly because I had some problems with memory
+    with torch.no_grad():
+        # Batches
+        for i, (lr_imgs, hr_imgs) in enumerate(test_loader):
+            if i != 0:
+                continue
+            # Move to default device
+            lr_imgs = lr_imgs.to(
+                device
+            )  # (batch_size (1), 3, w / 4, h / 4), imagenet-normed
+            hr_imgs = hr_imgs.to(device)  # (batch_size (1), 3, w, h), in [-1, 1]
+
+            # Forward prop.
+            sr_imgs = model(lr_imgs)  # (1, 3, w, h), in [-1, 1]
+            for lr_img, hr_img, sr_img in zip(lr_imgs, hr_imgs, sr_imgs):
+                lr_img=lr_img * imagenet_std + imagenet_mean
+                lr_img = convert_image(lr_img, source="[0, 1]", target="pil")
+                hr_img = convert_image(hr_img, source="[-1, 1]", target="pil")
+                sr_img = convert_image(sr_img, source="[-1, 1]", target="pil")
+                lr_img.save(f"{test_data_name}_LR.png")
+                hr_img.save(f"{test_data_name}_HR.png")
+                sr_img.save(f"{test_data_name}_SR.png")
+
+
 # %%

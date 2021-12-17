@@ -20,7 +20,7 @@ class ConvolutionalBlock(nn.Module):
     ):
         """
         :param in_channels: number of input channels
-        :param out_channels: number of output channe;s
+        :param out_channels: number of output channels
         :param kernel_size: kernel size
         :param stride: stride
         :param batch_norm: include a BN layer?
