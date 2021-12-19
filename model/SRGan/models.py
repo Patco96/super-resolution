@@ -181,7 +181,8 @@ class SRResNet(nn.Module):
 
         # Scaling factor must be 2, 4, or 8
         scaling_factor = int(scaling_factor)
-        assert scaling_factor in {2, 4, 8}, "The scaling factor must be 2, 4, or 8!"
+        assert scaling_factor in {
+            2, 4, 8}, "The scaling factor must be 2, 4, or 8!"
 
         # The first convolutional block
         self.conv_block1 = ConvolutionalBlock(
@@ -195,7 +196,8 @@ class SRResNet(nn.Module):
         # A sequence of n_blocks residual blocks, each containing a skip-connection across the block
         self.residual_blocks = nn.Sequential(
             *[
-                ResidualBlock(kernel_size=small_kernel_size, n_channels=n_channels)
+                ResidualBlock(kernel_size=small_kernel_size,
+                              n_channels=n_channels)
                 for i in range(n_blocks)
             ]
         )
@@ -389,7 +391,7 @@ class TruncatedVGG19(nn.Module):
         super(TruncatedVGG19, self).__init__()
 
         # Load the pre-trained VGG19 available in torchvision
-        vgg19 = torchvision.models.vgg19(pretrained=True)
+        vgg19 = torchvision.model.vgg19(pretrained=True)
 
         maxpool_counter = 0
         conv_counter = 0

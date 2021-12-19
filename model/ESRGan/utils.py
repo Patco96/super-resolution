@@ -1,9 +1,7 @@
 import collections.abc
 import math
 import torch
-import torchvision
 import warnings
-from distutils.version import LooseVersion
 from itertools import repeat
 from torch import nn as nn
 from torch.nn import functional as F

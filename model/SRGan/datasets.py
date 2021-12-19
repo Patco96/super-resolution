@@ -1,7 +1,7 @@
 import os
 import json
 from PIL import Image
-from models.SRGan.utils import ImageTransforms
+from model.SRGan.utils import ImageTransforms
 from torch.utils.data import Dataset
 
 
@@ -41,8 +41,10 @@ class SRDataset(Dataset):
         assert self.split in {"train", "test"}
         if self.split == "test" and self.test_data_name is None:
             raise ValueError("Please provide the name of the test dataset!")
-        assert lr_img_type in {"[0, 255]", "[0, 1]", "[-1, 1]", "imagenet-norm"}
-        assert hr_img_type in {"[0, 255]", "[0, 1]", "[-1, 1]", "imagenet-norm"}
+        assert lr_img_type in {"[0, 255]",
+                               "[0, 1]", "[-1, 1]", "imagenet-norm"}
+        assert hr_img_type in {"[0, 255]",
+                               "[0, 1]", "[-1, 1]", "imagenet-norm"}
 
         # If this is a training dataset, then crop dimensions must be perfectly divisible by the scaling factor
         # (If this is a test dataset, images are not cropped to a fixed size, so this variable isn't used)
@@ -57,7 +59,8 @@ class SRDataset(Dataset):
                 self.images = json.load(j)
         else:
             with open(
-                os.path.join(data_folder, self.test_data_name + "_test_images.json"),
+                os.path.join(data_folder, self.test_data_name +
+                             "_test_images.json"),
                 "r",
             ) as j:
                 self.images = json.load(j)

@@ -8,7 +8,7 @@ import numpy as np
 import os
 import torch
 
-from models.ESRGan.models import RRDBNet
+from model.ESRGan.models import RRDBNet
 
 model_path = 'weights/ESRGAN_SRx4_DF2KOST_official-ff704c30.pth'  # noqa: E501
 input_path = 'data/SR_testing_datasets/BSDS100/'  # input test image folder

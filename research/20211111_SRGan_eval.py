@@ -1,14 +1,19 @@
-#%%
+# %%
+from matplotlib import cm
+from PIL import Image
+import numpy as np
+import matplotlib.pyplot as plt
 import os
 import torch
 
-from models.SRGan.utils import convert_image, AverageMeter, create_data_lists
-from models.SRGan.datasets import SRDataset
+from model.SRGan.utils import convert_image, AverageMeter, create_data_lists
+from model.SRGan.datasets import SRDataset
 from skimage.metrics import peak_signal_noise_ratio, structural_similarity
+# import model.SRGan.models as models
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-data_folder = "../data"
+data_folder = "data"
 train_folders = os.path.join(data_folder, "SR_training_datasets/BSDS200")
 test_folders = os.path.join(data_folder, "SR_testing_datasets/BSDS100")
 
@@ -16,30 +21,31 @@ create_data_lists(
     [train_folders], [test_folders], min_size=100, output_folder=data_folder
 )
 
-#%%
+# %%
 
 
 # Data
-data_folder = "../data/"
+data_folder = "data/"
 test_data_names = ["Set5", "Set14", "BSDS100"]
 test_data_names = ["BSDS100"]
 
 # Model checkpoints
-srgan_checkpoint = "../weights/checkpoint_srgan.pth.tar"
-srresnet_checkpoint = "../weights/checkpoint_srresnet.pth.tar"
+srgan_checkpoint = "weights/checkpoint_srgan.pth.tar"
+srresnet_checkpoint = "weights/checkpoint_srresnet.pth.tar"
 
 # Load model, either the SRResNet or the SRGAN
 # srresnet = torch.load(srresnet_checkpoint)['model'].to(device)
 # srresnet.eval()
 # model = srresnet
-#%%
+# %%
+# srgan_generator =
 srgan_generator = torch.load(srgan_checkpoint, map_location=device)["generator"].to(
     device
 )
 srgan_generator.eval()
 model = srgan_generator
 
-#%%
+# %%
 # Evaluate
 
 for test_data_name in test_data_names:
@@ -71,7 +77,8 @@ for test_data_name in test_data_names:
             lr_imgs = lr_imgs.to(
                 device
             )  # (batch_size (1), 3, w / 4, h / 4), imagenet-normed
-            hr_imgs = hr_imgs.to(device)  # (batch_size (1), 3, w, h), in [-1, 1]
+            # (batch_size (1), 3, w, h), in [-1, 1]
+            hr_imgs = hr_imgs.to(device)
 
             # Forward prop.
             sr_imgs = model(lr_imgs)  # (1, 3, w, h), in [-1, 1]
@@ -102,36 +109,38 @@ for test_data_name in test_data_names:
 
 print("\n")
 # %%
-import matplotlib.pyplot as plt
 
-imagenet_mean = torch.FloatTensor([0.485, 0.456, 0.406]).unsqueeze(1).unsqueeze(2)
-imagenet_std = torch.FloatTensor([0.229, 0.224, 0.225]).unsqueeze(1).unsqueeze(2)
+imagenet_mean = torch.FloatTensor(
+    [0.485, 0.456, 0.406]).unsqueeze(1).unsqueeze(2)
+imagenet_std = torch.FloatTensor(
+    [0.229, 0.224, 0.225]).unsqueeze(1).unsqueeze(2)
 
 for lr_img, sr_img, hr_img in zip(lr_imgs, sr_imgs, hr_imgs):
     lr_img = (lr_img*imagenet_std.to(device)) + imagenet_mean.to(device)
     lr_img = lr_img.squeeze(0).cpu().numpy()
     sr_img = sr_img.squeeze(0).cpu().numpy()
     hr_img = hr_img.squeeze(0).cpu().numpy()
-    sr_img = convert_image(sr_img.reshape(sr_img.shape[1], sr_img.shape[2], sr_img.shape[0]), source="[-1, 1]", target="pil")
+    sr_img = convert_image(sr_img.reshape(
+        sr_img.shape[1], sr_img.shape[2], sr_img.shape[0]), source="[-1, 1]", target="pil")
     hr_img = convert_image(hr_img, source="[-1, 1]", target="pil")
     fig, ax = plt.subplots(1, 3, figsize=(30, 10))
-    ax[0].imshow(lr_img.reshape(lr_img.shape[1], lr_img.shape[2], lr_img.shape[0]), cmap="gray")
+    ax[0].imshow(lr_img.reshape(lr_img.shape[1],
+                 lr_img.shape[2], lr_img.shape[0]), cmap="gray")
     ax[0].set_title("LR")
-    ax[1].imshow(sr_img.reshape(sr_img.shape[1], sr_img.shape[2], sr_img.shape[0]), cmap="gray")
+    ax[1].imshow(sr_img.reshape(sr_img.shape[1],
+                 sr_img.shape[2], sr_img.shape[0]), cmap="gray")
     ax[1].set_title("SR")
-    ax[2].imshow(hr_img.reshape(hr_img.shape[1], hr_img.shape[2], hr_img.shape[0]), cmap="gray")    
+    ax[2].imshow(hr_img.reshape(hr_img.shape[1],
+                 hr_img.shape[2], hr_img.shape[0]), cmap="gray")
     ax[2].set_title("HR")
 
 # %%
-import numpy as np
-from PIL import Image
-from matplotlib import cm
 
 name = []
 for image, img_name in zip([lr_img, sr_img, hr_img], ["LR", "SR", "HR"]):
     img = image.reshape(image.shape[1], image.shape[2], image.shape[0])*255
     pil_img = Image.fromarray(np.uint8(img))
-    pil_img.save(f"{img_name}.png")
+    # pil_img.save(f"{img_name}.png")
 # %%
 pil_img
 # %%
@@ -142,9 +151,10 @@ Image.fromarray(np.uint8(img))
 # .save("LR.png")
 # %%
 
-from utils import convert_image
-imagenet_mean = torch.FloatTensor([0.485, 0.456, 0.406]).unsqueeze(1).unsqueeze(2)
-imagenet_std = torch.FloatTensor([0.229, 0.224, 0.225]).unsqueeze(1).unsqueeze(2)
+imagenet_mean = torch.FloatTensor(
+    [0.485, 0.456, 0.406]).unsqueeze(1).unsqueeze(2)
+imagenet_std = torch.FloatTensor(
+    [0.229, 0.224, 0.225]).unsqueeze(1).unsqueeze(2)
 
 for test_data_name in test_data_names:
     print("\nFor %s:\n" % test_data_name)
@@ -173,12 +183,13 @@ for test_data_name in test_data_names:
             lr_imgs = lr_imgs.to(
                 device
             )  # (batch_size (1), 3, w / 4, h / 4), imagenet-normed
-            hr_imgs = hr_imgs.to(device)  # (batch_size (1), 3, w, h), in [-1, 1]
+            # (batch_size (1), 3, w, h), in [-1, 1]
+            hr_imgs = hr_imgs.to(device)
 
             # Forward prop.
             sr_imgs = model(lr_imgs)  # (1, 3, w, h), in [-1, 1]
             for lr_img, hr_img, sr_img in zip(lr_imgs, hr_imgs, sr_imgs):
-                lr_img=lr_img * imagenet_std + imagenet_mean
+                lr_img = lr_img * imagenet_std + imagenet_mean
                 lr_img = convert_image(lr_img, source="[0, 1]", target="pil")
                 hr_img = convert_image(hr_img, source="[-1, 1]", target="pil")
                 sr_img = convert_image(sr_img, source="[-1, 1]", target="pil")
