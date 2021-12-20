@@ -19,7 +19,7 @@ create_data_lists(
 )
 # %%
 # Data parameters
-data_folder = './'  # folder with JSON data files
+data_folder = 'data/animals'  # folder with JSON data files
 crop_size = 96  # crop size of target HR images
 scaling_factor = 4  # the scaling factor for the generator; the input LR images will be downsampled from the target HR images by this factor
 
@@ -31,7 +31,7 @@ small_kernel_size_g = 3
 n_channels_g = 64  # number of channels in-between, i.e. the input and output channels for the residual and subpixel convolutional blocks
 n_blocks_g = 16  # number of residual blocks
 # filepath of the trained SRResNet checkpoint used for initialization
-srresnet_checkpoint = "./checkpoint_srresnet.pth.tar"
+srresnet_checkpoint = "weights/checkpoint_srresnet.pth.tar"
 
 # Discriminator parameters
 kernel_size_d = 3  # kernel size in all convolutional blocks
@@ -40,10 +40,11 @@ n_blocks_d = 8  # number of convolutional blocks
 fc_size_d = 1024  # size of the first fully connected layer
 
 # Learning parameters
-checkpoint = None  # path to model (SRGAN) checkpoint, None if none
+# path to model (SRGAN) checkpoint, None if none
+checkpoint = "weights/checkpoint_srgan.pth.tar"
 batch_size = 16  # batch size
 start_epoch = 0  # start at this epoch
-iterations = 2e5  # number of training iterations
+iterations = 3  # number of training iterations
 workers = 4  # number of workers for loading data in the DataLoader
 vgg19_i = 5  # the index i in the definition for VGG loss; see paper or models.py
 vgg19_j = 4  # the index j in the definition for VGG loss; see paper or models.py
@@ -188,8 +189,6 @@ def train(train_loader, generator, discriminator, truncated_vgg19, content_loss_
     del lr_imgs, hr_imgs, sr_imgs, hr_imgs_in_vgg_space, sr_imgs_in_vgg_space, hr_discriminated, sr_discriminated
 
 
-# %%
-
 # Initialize model or load checkpoint
 if checkpoint is None:
     # Generator
@@ -213,14 +212,23 @@ if checkpoint is None:
     optimizer_d = torch.optim.Adam(params=filter(lambda p: p.requires_grad, discriminator.parameters()),
                                    lr=lr)
 else:
-    checkpoint = torch.load(checkpoint)
-    start_epoch = checkpoint['epoch'] + 1
+    srgan_checkpoint = "weights/checkpoint_srgan.pth.tar"
+    # ['generator'].to(device)
+    srgan_generator = torch.load(srgan_checkpoint, map_location=device)
+    checkpoint = torch.load(checkpoint, map_location=torch.device(device))
+    start_epoch = 0  # checkpoint['epoch'] + 1
     generator = checkpoint['generator']
     discriminator = checkpoint['discriminator']
-    optimizer_g = checkpoint['optimizer_g']
-    optimizer_d = checkpoint['optimizer_d']
-    print("\nLoaded checkpoint from epoch %d.\n" %
-          (checkpoint['epoch'] + 1))
+    try:
+        optimizer_g = checkpoint['optimizer_g']
+        optimizer_d = checkpoint['optimizer_d']
+    except KeyError as e:
+        print(e)
+        optimizer_g = torch.optim.Adam(params=filter(
+            lambda p: p.requires_grad, generator.parameters()), lr=lr)
+        optimizer_d = torch.optim.Adam(params=filter(
+            lambda p: p.requires_grad, discriminator.parameters()), lr=lr)
+    print("\nLoaded checkpoint from epoch %d.\n" % (start_epoch))
 
 # Truncated VGG19 network to be used in the loss calculation
 truncated_vgg19 = TruncatedVGG19(i=vgg19_i, j=vgg19_j)
@@ -277,3 +285,5 @@ for epoch in range(start_epoch, epochs):
                 'optimizer_g': optimizer_g,
                 'optimizer_d': optimizer_d},
                'checkpoint_srgan.pth.tar')
+
+# %%

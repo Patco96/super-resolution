@@ -391,7 +391,7 @@ class TruncatedVGG19(nn.Module):
         super(TruncatedVGG19, self).__init__()
 
         # Load the pre-trained VGG19 available in torchvision
-        vgg19 = torchvision.model.vgg19(pretrained=True)
+        vgg19 = torchvision.models.vgg19(pretrained=True)
 
         maxpool_counter = 0
         conv_counter = 0
