@@ -50,7 +50,7 @@ fc_size_d = 1024  # size of the first fully connected layer
 checkpoint = "weights/checkpoint_srgan.pth.tar"
 batch_size = 16  # batch size
 start_epoch = 0  # start at this epoch
-iterations = 25000  # number of training iterations
+iterations = 2e5  # number of training iterations
 workers = 4  # number of workers for loading data in the DataLoader
 vgg19_i = 5  # the index i in the definition for VGG loss; see paper or models.py
 vgg19_j = 4  # the index j in the definition for VGG loss; see paper or models.py
@@ -88,7 +88,7 @@ def train(
     :param optimizer_g: optimizer for the generator
     :param optimizer_d: optimizer for the discriminator
     :param epoch: epoch number
-    "
+    """
     # Set to train mode
     generator.train()
     discriminator.train()  # training mode enables batch normalization
@@ -248,6 +248,7 @@ if checkpoint is None:
     )
 else:
     srgan_checkpoint = "weights/checkpoint_srgan.pth.tar"
+    srgan_checkpoint = "checkpoint_srgan.pth.tar"
     # ['generator'].to(device)
     srgan_generator = torch.load(srgan_checkpoint, map_location=device)
     checkpoint = torch.load(checkpoint, map_location=torch.device(device))
