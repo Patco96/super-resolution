@@ -26,7 +26,7 @@ En **model** se tienen los scripts **viz&#46;py** y **inference&#46;py** que con
 
 Estos son resultados utilizando los pesos pre-entrenados de las distintas arquitecturas probadas:
 
-![imagen](./images/SR-comparisson.png)
+![imagen](./images/SR-comparisson.jpeg)
 
 
 <p align="center">
