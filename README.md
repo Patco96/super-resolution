@@ -50,6 +50,8 @@ SRGAN &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp
 &nbsp; &nbsp;
   <img alt="3" src="./images/me/Original.jpeg" width="30%">
 </p>
+
+
 ## Entrenamiento y datasets
 
 Se descargaron múltiples datasets de (TODO: Agregar link) y se reentrenaron ambas redes para dos casos particulares: imagenes de animales e imagenes de paisajes.
