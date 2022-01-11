@@ -4,14 +4,20 @@ from PIL import Image
 from model.viz import load_models
 from model.inference import load_image, srresnet_predict, esrgan_predict, srgan_predict
 
-srresnet, srgan_generator, esrgan_generator = load_models()
+
+@st.experimental_singleton()
+def get_models():
+    return load_models()
 
 
-srgan_checkpoint = "checkpoint_srgan_animals_81.pth.tar"
-device = "cpu"
-srgan_generator_animals = torch.load(srgan_checkpoint, map_location=device)[
-    'generator'].to(device)
-srgan_generator_animals.eval()
+srresnet, srgan_generator, esrgan_generator = get_models()
+
+
+# srgan_checkpoint = "checkpoint_srgan_animals_81.pth.tar"
+# device = "cpu"
+# srgan_generator_animals = torch.load(srgan_checkpoint, map_location=device)[
+#     'generator'].to(device)
+# srgan_generator_animals.eval()
 
 st.title("Super-Resolution")
 
@@ -47,10 +53,10 @@ if original_img:
             sr_img_srgan = srgan_predict(srgan_generator, lr_img)
         st.image(sr_img_srgan, use_column_width=True)
 
-        st.write("SRGAN animals")
-        with st.spinner("Generating SRGAN animals image..."):
-            sr_img_srgan = srgan_predict(srgan_generator_animals, lr_img)
-        st.image(sr_img_srgan, use_column_width=True)
+        # st.write("SRGAN animals")
+        # with st.spinner("Generating SRGAN animals image..."):
+        #     sr_img_srgan = srgan_predict(srgan_generator_animals, lr_img)
+        # st.image(sr_img_srgan, use_column_width=True)
 
         st.write("ESRGAN")
         with st.spinner("Generating ESRGAN image..."):
