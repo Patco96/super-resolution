@@ -111,8 +111,10 @@ for test_data_name in test_data_names:
 print("\n")
 # %%
 
-imagenet_mean = torch.FloatTensor([0.485, 0.456, 0.406]).unsqueeze(1).unsqueeze(2)
-imagenet_std = torch.FloatTensor([0.229, 0.224, 0.225]).unsqueeze(1).unsqueeze(2)
+imagenet_mean = torch.FloatTensor(
+    [0.485, 0.456, 0.406]).unsqueeze(1).unsqueeze(2)
+imagenet_std = torch.FloatTensor(
+    [0.229, 0.224, 0.225]).unsqueeze(1).unsqueeze(2)
 
 for lr_img, sr_img, hr_img in zip(lr_imgs, sr_imgs, hr_imgs):
     lr_img = (lr_img * imagenet_std.to(device)) + imagenet_mean.to(device)
@@ -156,8 +158,10 @@ Image.fromarray(np.uint8(img))
 # .save("LR.png")
 # %%
 
-imagenet_mean = torch.FloatTensor([0.485, 0.456, 0.406]).unsqueeze(1).unsqueeze(2)
-imagenet_std = torch.FloatTensor([0.229, 0.224, 0.225]).unsqueeze(1).unsqueeze(2)
+imagenet_mean = torch.FloatTensor(
+    [0.485, 0.456, 0.406]).unsqueeze(1).unsqueeze(2)
+imagenet_std = torch.FloatTensor(
+    [0.229, 0.224, 0.225]).unsqueeze(1).unsqueeze(2)
 
 for test_data_name in test_data_names:
     print("\nFor %s:\n" % test_data_name)
