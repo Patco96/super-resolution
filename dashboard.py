@@ -119,4 +119,4 @@ if original_img:
     df = pd.DataFrame(results)
     df.drop(columns=["Image"], inplace=True)
 
-    st.table(df, index=False)
+    st.table(df)
