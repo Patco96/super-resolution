@@ -5,6 +5,8 @@ import pandas as pd
 import streamlit as st
 
 from PIL import Image
+from pathlib import Path
+
 from model.viz import load_models
 from model.inference import load_image, srresnet_predict, esrgan_predict, srgan_predict
 from model.SRGan.utils import convert_image
@@ -37,9 +39,9 @@ select_sample = st.checkbox("Select a sample", False)
 results = []
 
 if select_sample:
+    samples = os.listdir(Path(__file__).parents[0] / "images/samples/")
 
-    options = [f.split("/")[-1]
-               for f in os.listdir("images/samples/") if not f.startswith(".")]
+    options = [f.split("/")[-1] for f in samples if not f.startswith(".")]
 
     # Show samples
     selected_image = st.selectbox("Select a sample", options,
