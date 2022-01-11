@@ -100,24 +100,23 @@ if original_img:
         st.image(hr_img, use_column_width=True)
         results.append({"Model": "High resolution", "Image": hr_img})
 
-st.header("Metrics")
+    st.header("Metrics")
 
+    def get_ssim(sr_img, hr_img):
+        return structural_similarity(
+            np.array(hr_img), np.array(sr_img), data_range=255.0
+        )
 
-def get_ssim(sr_img, hr_img):
-    return structural_similarity(
-        np.array(hr_img), np.array(sr_img), data_range=255.0
-    )
+    np_hr_img = np.array(hr_img)
+    for idx, result in enumerate(results):
+        np_sr_img = np.array(result["Image"])
 
-np_hr_img = np.array(hr_img)
-for idx, result in enumerate(results):
-    np_sr_img = np.array(result["Image"])
+        results[idx]["PSNR"] = peak_signal_noise_ratio(
+            np_hr_img, np_sr_img, data_range=255.0)
+        results[idx]["SSIM"] = structural_similarity(
+            np_hr_img, np_sr_img, data_range=255.0, multichannel=True)
 
-    results[idx]["PSNR"] = peak_signal_noise_ratio(
-        np_hr_img, np_sr_img, data_range=255.0)
-    results[idx]["SSIM"] = structural_similarity(
-        np_hr_img, np_sr_img, data_range=255.0, multichannel=True)
+    df = pd.DataFrame(results)
+    df.drop(columns=["Image"], inplace=True)
 
-df = pd.DataFrame(results)
-df.drop(columns=["Image"], inplace=True)
-
-st.table(df)
+    st.table(df, index=False)
