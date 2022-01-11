@@ -34,7 +34,7 @@ srresnet, srgan_generator, esrgan_generator = get_models()
 st.title("Super-Resolution")
 
 
-select_sample = st.checkbox("Select a sample", False)
+select_sample = False  # st.checkbox("Select a sample", False)
 
 results = []
 
