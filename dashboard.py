@@ -23,6 +23,24 @@ def format_func(s: str):
     return s.split(".")[0]
 
 
+def open_image(img_path: str):
+    img = Image.open(img_path, mode="r")
+    size = img.size
+    if size[0] & 4 != 0:
+        print("Warning: image width is not a multiple of 4")
+        print("Cropping image... to " +
+              str((0, 0, size[0]-size[0] % 4, size[1])))
+        img = img.crop((0, 0, size[0]-size[0] % 4, size[1]))
+    size = img.size
+    if size[1] & 4 != 0:
+        print("Warning: image height is not a multiple of 4")
+        print("Cropping image... to " +
+              str((0, 0, size[0], size[1]-size[1] % 4)))
+        img = img.crop((0, 0, size[0], size[1]-size[1] % 4))
+
+    return img
+
+
 srresnet, srgan_generator, esrgan_generator = get_models()
 
 
@@ -124,7 +142,7 @@ else:
 
     if original_img:
 
-        original_img = Image.open(original_img, mode="r")
+        original_img = open_image(original_img)
 
         st.image(original_img, caption="Original image", use_column_width=True)
 
@@ -198,11 +216,14 @@ else:
         np_hr_img = np.array(hr_img)
         for idx, result in enumerate(results):
             np_sr_img = np.array(result["Image"])
-
-            results[idx]["PSNR"] = peak_signal_noise_ratio(
-                np_hr_img, np_sr_img, data_range=255.0)
-            results[idx]["SSIM"] = structural_similarity(
-                np_hr_img, np_sr_img, data_range=255.0, multichannel=True)
+            try:
+                results[idx]["PSNR"] = peak_signal_noise_ratio(
+                    np_hr_img, np_sr_img, data_range=255.0)
+                results[idx]["SSIM"] = structural_similarity(
+                    np_hr_img, np_sr_img, data_range=255.0, multichannel=True)
+            except ValueError as e:
+                st.write(results[idx]["Model"] + " has np_hr_img shape: " + str(
+                    np_hr_img.shape) + " and np_sr_img shape: " + str(np_sr_img.shape))
 
         df = pd.DataFrame(results)
         df.drop(columns=["Image"], inplace=True)
