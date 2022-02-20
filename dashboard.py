@@ -1,17 +1,16 @@
+from skimage.metrics import peak_signal_noise_ratio, structural_similarity
+from model.SRGan.utils import convert_image
+from model.inference import load_image, srresnet_predict, esrgan_predict, srgan_predict
+from model.viz import load_models
+from pathlib import Path
+from PIL import Image
 import os
 import time
 # import torch
 import numpy as np
 import pandas as pd
 import streamlit as st
-
-from PIL import Image
-from pathlib import Path
-
-from model.viz import load_models
-from model.inference import load_image, srresnet_predict, esrgan_predict, srgan_predict
-from model.SRGan.utils import convert_image
-from skimage.metrics import peak_signal_noise_ratio, structural_similarity
+st.set_page_config(layout="wide")
 
 
 @st.experimental_singleton()
@@ -27,14 +26,12 @@ def open_image(img_path: str):
     img = Image.open(img_path, mode="r")
     size = img.size
     if size[0] % 4 != 0:
-        print("Warning: image width is not a multiple of 4")
-        print("Cropping image... to " +
+        print("Cropping image to " +
               str((0, 0, size[0]-size[0] % 4, size[1])))
         img = img.crop((0, 0, size[0]-size[0] % 4, size[1]))
     size = img.size
     if size[1] % 4 != 0:
-        print("Warning: image height is not a multiple of 4")
-        print("Cropping image... to " +
+        print("Cropping image to " +
               str((0, 0, size[0], size[1]-size[1] % 4)))
         img = img.crop((0, 0, size[0], size[1]-size[1] % 4))
 
@@ -143,8 +140,8 @@ else:
     if original_img:
 
         original_img = open_image(original_img)
-        st.write(original_img.size)
-        st.image(original_img, caption="Original image", use_column_width=True)
+
+        # st.image(original_img, caption="Original image", use_column_width=True)
 
         col1, col2 = st.columns(2)
 
