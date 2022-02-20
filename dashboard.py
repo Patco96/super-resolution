@@ -46,6 +46,64 @@ if show_comparisson:
     with st.expander("See images"):
         st.image(images, width=100)
 
+    original_imgs = [Image.open(image) for image in images]
+    hr_imgs, lr_imgs = [], []
+    for original_img in original_imgs:
+        hr_img, lr_img = load_image(original_img)
+        hr_imgs.append(hr_img)
+        lr_imgs.append(lr_img)
+
+    clicked = st.button("Predict")
+
+    if clicked:
+        results = []
+
+        # Nearest neighbor
+        t0 = time.time()
+        nearest_imgs = [lr_img.resize(
+            (hr_img.width, hr_img.height), Image.NEAREST) for lr_img in lr_imgs]
+        t1 = time.time()
+        results.append(
+            {"Model": "Nearest neighbour upsampling", "Image": nearest_imgs, "Time": t1-t0})
+
+        # Bicubic
+        t0 = time.time()
+        nearest_imgs = [lr_img.resize(
+            (hr_img.width, hr_img.height), Image.BICUBIC) for lr_img in lr_imgs]
+        t1 = time.time()
+        results.append({"Model": "Bicubic upsampling",
+                        "Image": nearest_imgs, "Time": t1-t0})
+
+        # SRResNet
+        t0 = time.time()
+        srresnet_imgs = [srresnet_predict(
+            srresnet, lr_img) for lr_img in lr_imgs]
+        t1 = time.time()
+        results.append(
+            {"Model": "SRResNet", "Image": srresnet_imgs, "Time": t1-t0})
+
+        # SRGAN
+        t0 = time.time()
+        sr_imgs_srgan = [srgan_predict(srgan_generator, lr_img)
+                         for lr_img in lr_imgs]
+        t1 = time.time()
+        results.append(
+            {"Model": "SRGAN", "Image": sr_imgs_srgan, "Time": t1-t0})
+
+        # ESRGAN
+        t0 = time.time()
+        sr_imgs_esrgan = [esrgan_predict(
+            esrgan_generator, lr_img) for lr_img in lr_imgs]
+        t1 = time.time()
+        results.append(
+            {"Model": "ESRGAN", "Image": sr_imgs_esrgan, "Time": t1-t0})
+
+        df = pd.DataFrame(results)
+        df.drop(columns=["Image"], inplace=True)
+
+        st.table(df)
+
+
 else:
     select_sample = st.checkbox("Select a sample", True)
 
@@ -86,11 +144,11 @@ else:
             st.write("Bicubic upsampling")
             t0 = time.time()
             nearest_img = lr_img.resize(
-                (hr_img.width, hr_img.height), Image.NEAREST)
+                (hr_img.width, hr_img.height), Image.BICUBIC)
             t1 = time.time()
             st.image(nearest_img, use_column_width=True)
             results.append(
-                {"Model": "Bicubic upsampling", "Image": nearest_img})
+                {"Model": "Bicubic upsampling", "Image": nearest_img, "Time": t1-t0})
 
             st.write("SRResNet")
             t0 = time.time()
