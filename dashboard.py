@@ -1,4 +1,5 @@
 import os
+import time
 # import torch
 import numpy as np
 import pandas as pd
@@ -62,30 +63,40 @@ if original_img:
     hr_img, lr_img = load_image(original_img)
     with col1:
         st.write("Nearest neighbour upsampling")
+        t0 = time.time()
         nearest_img = lr_img.resize(
             (hr_img.width, hr_img.height), Image.NEAREST)
+        t1 = time.time()
         st.image(nearest_img, use_column_width=True)
         results.append(
-            {"Model": "Nearest neighbour upsampling", "Image": nearest_img})
+            {"Model": "Nearest neighbour upsampling", "Image": nearest_img, "Time": t1-t0})
 
         st.write("Bicubic upsampling")
+        t0 = time.time()
         nearest_img = lr_img.resize(
             (hr_img.width, hr_img.height), Image.NEAREST)
+        t1 = time.time()
         st.image(nearest_img, use_column_width=True)
         results.append({"Model": "Bicubic upsampling", "Image": nearest_img})
 
         st.write("SRResNet")
+        t0 = time.time()
         srresnet_img = srresnet_predict(srresnet, lr_img)
+        t1 = time.time()
         st.image(srresnet_img, use_column_width=True)
-        results.append({"Model": "SRResNet", "Image": srresnet_img})
+        results.append(
+            {"Model": "SRResNet", "Image": srresnet_img, "Time": t1-t0})
 
     with col2:
 
         st.write("SRGAN")
         with st.spinner("Generating SRGAN image..."):
+            t0 = time.time()
             sr_img_srgan = srgan_predict(srgan_generator, lr_img)
+            t1 = time.time()
         st.image(sr_img_srgan, use_column_width=True)
-        results.append({"Model": "SRGAN", "Image": sr_img_srgan})
+        results.append(
+            {"Model": "SRGAN", "Image": sr_img_srgan, "Time": t1-t0})
 
         # st.write("SRGAN animals")
         # with st.spinner("Generating SRGAN animals image..."):
@@ -94,13 +105,17 @@ if original_img:
 
         st.write("ESRGAN")
         with st.spinner("Generating ESRGAN image..."):
+            t0 = time.time()
             sr_img_esrgan = esrgan_predict(esrgan_generator, lr_img)
+            t1 = time.time()
         st.image(sr_img_esrgan, use_column_width=True)
-        results.append({"Model": "ESRGAN", "Image": sr_img_esrgan})
+        results.append(
+            {"Model": "ESRGAN", "Image": sr_img_esrgan, "Time": t1-t0})
 
         st.write("High resolution")
         st.image(hr_img, use_column_width=True)
-        results.append({"Model": "High resolution", "Image": hr_img})
+        results.append({"Model": "High resolution",
+                       "Image": hr_img, "Time": "-"})
 
     st.header("Metrics")
 
