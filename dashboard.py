@@ -115,7 +115,7 @@ if original_img:
         st.write("High resolution")
         st.image(hr_img, use_column_width=True)
         results.append({"Model": "High resolution",
-                       "Image": hr_img, "Time": "-"})
+                       "Image": hr_img, "Time": 0})
 
     st.header("Metrics")
 
