@@ -26,13 +26,13 @@ def format_func(s: str):
 def open_image(img_path: str):
     img = Image.open(img_path, mode="r")
     size = img.size
-    if size[0] & 4 != 0:
+    if size[0] % 4 != 0:
         print("Warning: image width is not a multiple of 4")
         print("Cropping image... to " +
               str((0, 0, size[0]-size[0] % 4, size[1])))
         img = img.crop((0, 0, size[0]-size[0] % 4, size[1]))
     size = img.size
-    if size[1] & 4 != 0:
+    if size[1] % 4 != 0:
         print("Warning: image height is not a multiple of 4")
         print("Cropping image... to " +
               str((0, 0, size[0], size[1]-size[1] % 4)))
@@ -143,7 +143,7 @@ else:
     if original_img:
 
         original_img = open_image(original_img)
-
+        st.write(original_img.size)
         st.image(original_img, caption="Original image", use_column_width=True)
 
         col1, col2 = st.columns(2)
