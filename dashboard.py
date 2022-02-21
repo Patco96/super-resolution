@@ -175,6 +175,11 @@ else:
 
         with col2:
 
+            st.write("High resolution")
+            st.image(hr_img, use_column_width=True)
+            results.append({"Model": "High resolution",
+                            "Image": hr_img, "Time": 0})
+
             st.write("SRGAN")
             with st.spinner("Generating SRGAN image..."):
                 t0 = time.time()
@@ -197,11 +202,6 @@ else:
             st.image(sr_img_esrgan, use_column_width=True)
             results.append(
                 {"Model": "ESRGAN", "Image": sr_img_esrgan, "Time": t1-t0})
-
-            st.write("High resolution")
-            st.image(hr_img, use_column_width=True)
-            results.append({"Model": "High resolution",
-                            "Image": hr_img, "Time": 0})
 
         st.header("Metrics")
 
