@@ -1,6 +1,7 @@
 # %%
 import os
 import time
+import torch
 import numpy as np
 import pandas as pd
 from skimage.metrics import peak_signal_noise_ratio, structural_similarity
@@ -26,6 +27,12 @@ def open_image(img_path: str):
 
 
 srresnet, srgan_generator, esrgan_generator = load_models()
+
+srgan_checkpoint = "checkpoint_srgan_animals_81.pth.tar"
+device = "cpu"
+srgan_generator_animals = torch.load(srgan_checkpoint, map_location=device)[
+    'generator'].to(device)
+srgan_generator_animals.eval()
 
 
 # %%
