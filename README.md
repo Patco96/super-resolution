@@ -12,7 +12,7 @@ Implementaciones de distintos algoritmos de aplicacion de super-resolution a ima
 
 4 - Instalar los requerimientos con `pip install -r requirements.txt`.
 
-5 - Descargar los pesos de los modelos de (TODO: Agregar link) y colocarlos en *super-resolution/weights/*.
+5 - Descargar los pesos de los modelos de drive para [ESRGAN](https://drive.google.com/drive/folders/11EDB_YuHQmcbUFm2GE0xcekvZ2b7YOT-) y [SRGAN](https://drive.google.com/drive/folders/12OG-KawSFFs6Pah89V4a_Td-VcwMBE5i) y colocarlos en *super-resolution/weights/*.
 
 6 - Correr el dashboard desde la terminal (con el venv activado) con el comando `streamlit run dashboard.py`.
 
@@ -28,43 +28,19 @@ Estos son resultados utilizando los pesos pre-entrenados de las distintas arquit
 
 ![imagen](./images/SR-comparisson.jpeg)
 
-
-<p align="center">
-Nearest neighbour &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Bicubic upsampling &nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; SRResNet &nbsp; &nbsp;&nbsp; &nbsp; 
-</p>
-<p align="center">
-  <img alt="1" src="./images/me/NearestNeighbour.jpeg" width="30%">
-&nbsp; &nbsp;
-  <img alt="2" src="./images/me/Bicubic.jpeg" width="30%">
-&nbsp; &nbsp;
-  <img alt="3" src="./images/me/SRResNet.jpeg" width="30%">
-</p>
-
-<p align="center">
-SRGAN &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ESRGAN &nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Original &nbsp;&nbsp; &nbsp; 
-</p>
-<p align="center">
-  <img alt="1" src="./images/me/NearestNeighbour.jpeg" width="30%">
-&nbsp; &nbsp;
-  <img alt="2" src="./images/me/Bicubic.jpeg" width="30%">
-&nbsp; &nbsp;
-  <img alt="3" src="./images/me/Original.jpeg" width="30%">
-</p>
-
-
 ## Entrenamiento y datasets
 
-Se descargaron múltiples datasets de (TODO: Agregar link) y se reentrenaron ambas redes para dos casos particulares: imagenes de animales e imagenes de paisajes.
+Se descargaron múltiples datasets de [Kaggle](https://www.kaggle.com/andrewmvd/animal-faces) y se reentrenaron ambas redes para un caso particular: imagenes de caras de animales.
 
-El dataset de animales consiste en (TODO: Agregar numero) imagenes de perros y gatos y el dataset de paisajes consiste en (TODO: Agregar numero) imagenes
+El dataset de animales consiste en mas de 15000 imagenes de perros, gatos y animales salvajes.
 
-Se entrenó en ambos casos durante (TODO: Agregar numero) epochs.
+Se realizaron distintos entrenamientos para encontrar la configuracion que producia mejores resultados.
 
-Se tienen de esta forma tres sets de pesos, uno general descargado de internet entrenado con el dataset BSDS100, uno para animales y otro para paisajes.
+Se tienen de esta forma dos sets de pesos, uno general descargado de internet entrenado con el dataset BSDS100 y otro para animales.
 
-Se compararon las metricas de los 3 conjuntos de pesos para los 2 modelos con los 3 datasets. Se agrego como baseline un modelo SRResNet, obteniendose los siguientes resultados:
-(TODO: Agregar resultados de metricas para comparar calidad de imagenes, tiempo de entrenamiento, tiempo de inferencia).
 
 ## Dashboard
 
-Ademas de dichos resultados, se puede correr un dashboard hecho con streamlit para visualizar rapidamente resultados.
+Ademas de dichos resultados, se puede correr un dashboard hecho con streamlit para visualizar rapidamente resultados. Para ello, se necesita correr desde la linea de comandos `streamlit run dashboard.py` en la raiz del proyecto y estando con el venv activado.
+
+Este dashboard se encuentra deployado ademas ([link](https://share.streamlit.io/patco96/super-resolution/main/dashboard.py)).
