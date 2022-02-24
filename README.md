@@ -30,13 +30,11 @@ Estos son resultados utilizando los pesos pre-entrenados de las distintas arquit
 
 ## Entrenamiento y datasets
 
-Se descargaron múltiples datasets de [Kaggle](https://www.kaggle.com/andrewmvd/animal-faces) y se reentrenaron ambas redes para un caso particular: imagenes de caras de animales.
+Se analizaron múltiples datasets de [Kaggle](https://www.kaggle.com) y se opto porreentrenar SRGAN para un caso particular: imagenes de [caras de animales](https://www.kaggle.com/andrewmvd/animal-faces).
 
-El dataset de animales consiste en mas de 15000 imagenes de perros, gatos y animales salvajes.
+El dataset de animales consiste en mas de 15000 imagenes de perros, gatos y animales salvajes para entrenamiento, y 500 de cada clase de validacion.
 
-Se realizaron distintos entrenamientos para encontrar la configuracion que producia mejores resultados.
-
-Se tienen de esta forma dos sets de pesos, uno general descargado de internet entrenado con el dataset BSDS100 y otro para animales.
+Se tienen de esta forma dos sets de pesos para SRGAN, uno general descargado de internet entrenado con el dataset BSDS100 y otro para animales.
 
 
 ## Dashboard
