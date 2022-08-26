@@ -40,8 +40,14 @@ def grid_figure(img, srresnet, srgan_generator, esrgan_generator):
     margin = 40
     N_cols = 3
     N_rows = 2
-    grid_img = Image.new('RGB', (N_cols * hr_img.width + (N_cols+1) * margin,
-                         N_rows * hr_img.height + (N_rows+1) * margin), (255, 255, 255))
+    grid_img = Image.new(
+        "RGB",
+        (
+            N_cols * hr_img.width + (N_cols + 1) * margin,
+            N_rows * hr_img.height + (N_rows + 1) * margin,
+        ),
+        (255, 255, 255),
+    )
 
     # Font
     draw = ImageDraw.Draw(grid_img)
@@ -51,7 +57,8 @@ def grid_figure(img, srresnet, srgan_generator, esrgan_generator):
         # Otherwise, use any TTF font of your choice
     except OSError:
         print(
-            "Defaulting to a terrible font. To use a font of your choice, include the link to its TTF file in the function.")
+            "Defaulting to a terrible font. To use a font of your choice, include the link to its TTF file in the function."
+        )
         font = ImageFont.load_default()
 
     # Place low resolution image
@@ -59,8 +66,12 @@ def grid_figure(img, srresnet, srgan_generator, esrgan_generator):
     y0 = margin
     grid_img.paste(nearest_img, (x0, y0))
     text_size = font.getsize("Nearest neighbour upsampling")
-    draw.text(xy=[x0 + nearest_img.width / 2 - text_size[0] / 2, y0 -
-                  text_size[1] - 5], text="Nearest neighbour upsampling", font=font, fill='black')
+    draw.text(
+        xy=[x0 + nearest_img.width / 2 - text_size[0] / 2, y0 - text_size[1] - 5],
+        text="Nearest neighbour upsampling",
+        font=font,
+        fill="black",
+    )
 
     # Place SRResNet image
     x0 = 2 * margin + sr_img_srresnet.width
@@ -68,9 +79,11 @@ def grid_figure(img, srresnet, srgan_generator, esrgan_generator):
     grid_img.paste(sr_img_srresnet, (x0, y0))
     text_size = font.getsize("SRResNet")
     draw.text(
-        xy=[x0 + sr_img_srresnet.width / 2 -
-            text_size[0] / 2, y0 - text_size[1] - 5],
-        text="SRResNet", font=font, fill='black')
+        xy=[x0 + sr_img_srresnet.width / 2 - text_size[0] / 2, y0 - text_size[1] - 5],
+        text="SRResNet",
+        font=font,
+        fill="black",
+    )
 
     # Place SRGAN image
     x0 = 3 * margin + sr_img_srresnet.width + sr_img_srresnet.width
@@ -80,16 +93,22 @@ def grid_figure(img, srresnet, srgan_generator, esrgan_generator):
     text_size = font.getsize("SRGAN")
     draw.text(
         xy=[x0 + bicubic_img.width / 2 - text_size[0] / 2, y0 - text_size[1] - 5],
-        text="SRGAN", font=font, fill='black')
+        text="SRGAN",
+        font=font,
+        fill="black",
+    )
 
     # Place bicubic-upsampled image
     x0 = margin
     y0 = 2 * margin + sr_img_srresnet.height
     grid_img.paste(bicubic_img, (x0, y0))
     text_size = font.getsize("Bicubic upsampling")
-    draw.text(xy=[x0 + bicubic_img.width / 2 - text_size[0] / 2, y0 - text_size[1] - 5], text="Bicubic upsampling",
-              font=font,
-              fill='black')
+    draw.text(
+        xy=[x0 + bicubic_img.width / 2 - text_size[0] / 2, y0 - text_size[1] - 5],
+        text="Bicubic upsampling",
+        font=font,
+        fill="black",
+    )
 
     # Place ESRGAN image
     x0 = 2 * margin + sr_img_srresnet.width
@@ -97,17 +116,23 @@ def grid_figure(img, srresnet, srgan_generator, esrgan_generator):
     grid_img.paste(sr_img_esrgan, (x0, y0))
     text_size = font.getsize("ESRGAN")
     draw.text(
-        xy=[x0 + sr_img_esrgan.width /
-            2 - text_size[0] / 2, y0 - text_size[1] - 5],
-        text="ESRGAN", font=font, fill='black')
+        xy=[x0 + sr_img_esrgan.width / 2 - text_size[0] / 2, y0 - text_size[1] - 5],
+        text="ESRGAN",
+        font=font,
+        fill="black",
+    )
 
     # Place original HR image
-    x0 = 3*margin+sr_img_srresnet.width+sr_img_srresnet.width
-    y0 = 2*margin+sr_img_srresnet.height
+    x0 = 3 * margin + sr_img_srresnet.width + sr_img_srresnet.width
+    y0 = 2 * margin + sr_img_srresnet.height
     grid_img.paste(hr_img, (x0, y0))
     text_size = font.getsize("Original HR")
-    draw.text(xy=[x0 + sr_img_srresnet.width / 2 - text_size[0] / 2,
-              y0 - text_size[1] - 1], text="Original HR", font=font, fill='black')
+    draw.text(
+        xy=[x0 + sr_img_srresnet.width / 2 - text_size[0] / 2, y0 - text_size[1] - 1],
+        text="Original HR",
+        font=font,
+        fill="black",
+    )
 
     # Display grid
     grid_img.show()
@@ -122,21 +147,23 @@ def load_models():
     # Model checkpoints
     srgan_checkpoint = "weights/checkpoint_srgan.pth.tar"
     srresnet_checkpoint = "weights/checkpoint_srresnet.pth.tar"
-    esrgan_checkpoint = 'weights/ESRGAN_SRx4_DF2KOST_official-ff704c30.pth'
+    esrgan_checkpoint = "weights/ESRGAN_SRx4_DF2KOST_official-ff704c30.pth"
 
     # Load models
-    srresnet = torch.load(srresnet_checkpoint, map_location=device)[
-        'model'].to(device)
+    srresnet = torch.load(srresnet_checkpoint, map_location=device)["model"].to(device)
     srresnet.eval()
 
-    srgan_generator = torch.load(srgan_checkpoint, map_location=device)[
-        'generator'].to(device)
+    srgan_generator = torch.load(srgan_checkpoint, map_location=device)["generator"].to(
+        device
+    )
     srgan_generator.eval()
 
-    esrgan_generator = RRDBNet(num_in_ch=3, num_out_ch=3, num_feat=64,
-                               num_block=23, num_grow_ch=32)
-    esrgan_generator.load_state_dict(torch.load(
-        esrgan_checkpoint)['params'], strict=True)
+    esrgan_generator = RRDBNet(
+        num_in_ch=3, num_out_ch=3, num_feat=64, num_block=23, num_grow_ch=32
+    )
+    esrgan_generator.load_state_dict(
+        torch.load(esrgan_checkpoint)["params"], strict=True
+    )
     esrgan_generator.eval()
     esrgan_generator = esrgan_generator.to(device)
 

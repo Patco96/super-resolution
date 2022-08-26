@@ -1,13 +1,16 @@
 # %%
 import os
 import time
-import torch
+
+import start  # noqa
+
 import numpy as np
 import pandas as pd
-from skimage.metrics import peak_signal_noise_ratio, structural_similarity
-from model.inference import load_image, srresnet_predict, esrgan_predict, srgan_predict
-from model.viz import load_models, grid_figure
+import torch
+from model.inference import esrgan_predict, load_image, srgan_predict, srresnet_predict
+from model.viz import grid_figure, load_models
 from PIL import Image
+from skimage.metrics import peak_signal_noise_ratio, structural_similarity
 
 
 def open_image(img_path: str):
@@ -27,7 +30,8 @@ def open_image(img_path: str):
 srresnet, srgan_generator, esrgan_generator = load_models()
 
 srgan_checkpoint = "checkpoint_srgan_animals_81.pth.tar"
-device = "cpu"
+srgan_checkpoint = "weights/checkpoint_srgan.pth.tar"
+device = "cuda"
 srgan_generator_animals = torch.load(srgan_checkpoint, map_location=device)[
     "generator"
 ].to(device)
@@ -44,9 +48,9 @@ srgan_generator_animals.eval()
 # ]
 
 folder_paths = [
-    "./data/animals/val/dog",
-    "./data/animals/val/cat",
-    "./data/animals/val/wild",
+    "data/animals/val/dog",
+    "data/animals/val/cat",
+    "data/animals/val/wild",
 ]
 images = []
 for folder_path in folder_paths:
@@ -71,31 +75,31 @@ results = []
 
 # SRResNet
 print("SRResNet")
-t0 = time.time()
+t0 = time.perf_counter()
 srresnet_imgs = [srresnet_predict(srresnet, lr_img) for lr_img in lr_imgs]
-t1 = time.time()
+t1 = time.perf_counter()
 results.append({"Model": "SRResNet", "Image": srresnet_imgs, "Time": t1 - t0})
 
 # SRGAN
 print("SRGAN")
-t0 = time.time()
+t0 = time.perf_counter()
 sr_imgs_srgan = [srgan_predict(srgan_generator, lr_img) for lr_img in lr_imgs]
-t1 = time.time()
+t1 = time.perf_counter()
 results.append({"Model": "SRGAN", "Image": sr_imgs_srgan, "Time": t1 - t0})
 
 # SRGAN animals
 print("SRGAN animals")
-t0 = time.time()
+t0 = time.perf_counter()
 sr_imgs_srgan = [srgan_predict(srgan_generator_animals, lr_img) for lr_img in lr_imgs]
-t1 = time.time()
+t1 = time.perf_counter()
 results.append({"Model": "SRGAN animals", "Image": sr_imgs_srgan, "Time": t1 - t0})
 
 
 # ESRGAN
 print("ESRGAN")
-t0 = time.time()
+t0 = time.perf_counter()
 sr_imgs_esrgan = [esrgan_predict(esrgan_generator, lr_img) for lr_img in lr_imgs]
-t1 = time.time()
+t1 = time.perf_counter()
 results.append({"Model": "ESRGAN", "Image": sr_imgs_esrgan, "Time": t1 - t0})
 
 df = pd.DataFrame(results)

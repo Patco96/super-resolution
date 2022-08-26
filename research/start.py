@@ -7,7 +7,9 @@ try:
     get_ipython().run_line_magic("load_ext", "autoreload")  # noqa
     get_ipython().run_line_magic("autoreload", "2")  # noqa
 
-    get_ipython().run_line_magic("config", 'InlineBackend.figure_format = "jpeg"')  # noqa
+    get_ipython().run_line_magic(
+        "config", 'InlineBackend.figure_format = "jpeg"'
+    )  # noqa
     get_ipython().run_line_magic("matplotlib", "inline")  # noqa
 
     import matplotlib

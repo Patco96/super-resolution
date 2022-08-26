@@ -88,7 +88,7 @@ class SubPixelConvolutionalBlock(nn.Module):
         # A convolutional layer that increases the number of channels by scaling factor^2, followed by pixel shuffle and PReLU
         self.conv = nn.Conv2d(
             in_channels=n_channels,
-            out_channels=n_channels * (scaling_factor ** 2),
+            out_channels=n_channels * (scaling_factor**2),
             kernel_size=kernel_size,
             padding=kernel_size // 2,
         )
@@ -181,8 +181,7 @@ class SRResNet(nn.Module):
 
         # Scaling factor must be 2, 4, or 8
         scaling_factor = int(scaling_factor)
-        assert scaling_factor in {
-            2, 4, 8}, "The scaling factor must be 2, 4, or 8!"
+        assert scaling_factor in {2, 4, 8}, "The scaling factor must be 2, 4, or 8!"
 
         # The first convolutional block
         self.conv_block1 = ConvolutionalBlock(
@@ -196,8 +195,7 @@ class SRResNet(nn.Module):
         # A sequence of n_blocks residual blocks, each containing a skip-connection across the block
         self.residual_blocks = nn.Sequential(
             *[
-                ResidualBlock(kernel_size=small_kernel_size,
-                              n_channels=n_channels)
+                ResidualBlock(kernel_size=small_kernel_size, n_channels=n_channels)
                 for i in range(n_blocks)
             ]
         )
